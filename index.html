@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JCC Hiring Screener</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --ink: #1a1714;
+    --paper: #f5f0e8;
+    --card: #fdfaf4;
+    --accent: #b84a2a;
+    --accent-light: #e8c4b8;
+    --rule: #d4c9b4;
+    --muted: #7a7060;
+    --pass: #2d6a4f;
+    --pass-bg: #d8f3dc;
+    --warn: #7b4f12;
+    --warn-bg: #fdebc8;
+    --fail: #6b1f1f;
+    --fail-bg: #f8d7da;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* Header */
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 28px 40px;
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    border-bottom: 4px solid var(--accent);
+  }
+
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.02em;
+  }
+
+  header span {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent-light);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Layout */
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 32px;
+  }
+
+  /* Step indicator */
+  .steps {
+    display: flex;
+    gap: 0;
+    margin-bottom: 40px;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .step {
+    flex: 1;
+    padding: 10px 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--card);
+    border-right: 1px solid var(--rule);
+    transition: all 0.2s;
+  }
+
+  .step:last-child { border-right: none; }
+
+  .step.active {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .step.done {
+    background: var(--accent);
+    color: white;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 32px;
+    margin-bottom: 24px;
+    display: none;
+  }
+
+  .card.visible { display: block; }
+
+  .card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.25rem;
+    margin-bottom: 6px;
+  }
+
+  .card-sub {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  /* Form elements */
+  label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+    margin-top: 20px;
+  }
+
+  label:first-of-type { margin-top: 0; }
+
+  select, input[type="text"], textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--ink);
+    transition: border-color 0.15s;
+    appearance: none;
+  }
+
+  select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7060' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+
+  select:focus, input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--ink);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.6;
+  }
+
+  .q-block {
+    margin-bottom: 20px;
+    padding: 16px;
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+  }
+
+  .q-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+
+  .q-text {
+    font-size: 0.85rem;
+    color: var(--ink);
+    font-weight: 500;
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  .q-text .purpose {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-block;
+    padding: 13px 28px;
+    border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+
+  .btn-primary {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .btn-primary:hover { background: var(--accent); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    margin-right: 12px;
+  }
+
+  .btn-secondary:hover { color: var(--ink); border-color: var(--ink); }
+
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .btn-row {
+    display: flex;
+    align-items: center;
+    margin-top: 28px;
+    gap: 8px;
+  }
+
+  /* Loading */
+  .loading {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+
+  .loading.visible { display: flex; }
+
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--rule);
+    border-top-color: var(--ink);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Results */
+  .results { display: none; }
+  .results.visible { display: block; }
+
+  .score-banner {
+    padding: 28px 32px;
+    border-radius: 6px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .score-banner.pass { background: var(--pass-bg); border: 1px solid #b7e4c7; }
+  .score-banner.review { background: var(--warn-bg); border: 1px solid #f4c87a; }
+  .score-banner.fail { background: var(--fail-bg); border: 1px solid #f0a0a0; }
+
+  .score-number {
+    font-family: 'DM Serif Display', serif;
+    font-size: 3.5rem;
+    line-height: 1;
+  }
+
+  .score-banner.pass .score-number { color: var(--pass); }
+  .score-banner.review .score-number { color: var(--warn); }
+  .score-banner.fail .score-number { color: var(--fail); }
+
+  .score-meta { flex: 1; }
+
+  .score-verdict {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .score-banner.pass .score-verdict { color: var(--pass); }
+  .score-banner.review .score-verdict { color: var(--warn); }
+  .score-banner.fail .score-verdict { color: var(--fail); }
+
+  .score-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .score-position {
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  /* Criteria breakdown */
+  .section-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .criteria-grid {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .criteria-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+  }
+
+  .criteria-name {
+    flex: 1;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .criteria-weight {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    background: var(--paper);
+    padding: 2px 6px;
+    border-radius: 2px;
+  }
+
+  .criteria-score-display {
+    display: flex;
+    gap: 3px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--rule);
+  }
+
+  .dot.filled { background: var(--ink); }
+  .dot.filled.good { background: var(--pass); }
+  .dot.filled.mid { background: #e09c3a; }
+  .dot.filled.low { background: var(--accent); }
+
+  .criteria-pts {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    min-width: 38px;
+    text-align: right;
+  }
+
+  /* Q analysis */
+  .q-analysis {
+    margin-bottom: 12px;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .q-analysis-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: white;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .q-analysis-header:hover { background: var(--paper); }
+
+  .q-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    background: var(--ink);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .q-analysis-title {
+    flex: 1;
+    font-size: 0.83rem;
+    font-weight: 500;
+  }
+
+  .q-signal {
+    font-size: 0.72rem;
+    font-family: 'DM Mono', monospace;
+    padding: 3px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .q-signal.strong { background: var(--pass-bg); color: var(--pass); }
+  .q-signal.mixed { background: var(--warn-bg); color: var(--warn); }
+  .q-signal.weak { background: var(--fail-bg); color: var(--fail); }
+
+  .q-analysis-body {
+    padding: 14px 16px;
+    border-top: 1px solid var(--rule);
+    background: var(--paper);
+    font-size: 0.84rem;
+    line-height: 1.65;
+    color: var(--ink);
+  }
+
+  /* Red flags */
+  .flags-section {
+    margin-bottom: 24px;
+  }
+
+  .flag-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    background: white;
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 6px;
+    font-size: 0.83rem;
+    line-height: 1.5;
+  }
+
+  .flag-icon {
+    flex-shrink: 0;
+    font-size: 0.85rem;
+    margin-top: 1px;
+  }
+
+  /* Recommendation */
+  .recommendation-box {
+    padding: 20px 24px;
+    border-radius: 6px;
+    background: var(--ink);
+    color: var(--paper);
+    margin-bottom: 24px;
+  }
+
+  .rec-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-light);
+    margin-bottom: 8px;
+  }
+
+  .rec-text {
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+
+  .reset-row {
+    text-align: center;
+    padding-top: 8px;
+  }
+
+  /* Errors */
+  .error-msg {
+    color: var(--accent);
+    font-size: 0.8rem;
+    font-family: 'DM Mono', monospace;
+    margin-top: 8px;
+    display: none;
+  }
+
+  .error-msg.visible { display: block; }
+
+  /* Resume toggle */
+  .resume-toggle {
+    display: flex;
+    gap: 0;
+    margin-bottom: 20px;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    width: fit-content;
+  }
+
+  .toggle-btn {
+    padding: 9px 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: none;
+    background: white;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    border-right: 1px solid var(--rule);
+  }
+
+  .toggle-btn:last-child { border-right: none; }
+
+  .toggle-btn.active {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .toggle-btn:hover:not(.active) {
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  /* PDF drop zone */
+  .pdf-drop {
+    border: 2px dashed var(--rule);
+    border-radius: 6px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    background: white;
+    transition: all 0.15s;
+  }
+
+  .pdf-drop:hover, .pdf-drop.drag-over {
+    border-color: var(--ink);
+    background: var(--paper);
+  }
+
+  .pdf-drop-icon { font-size: 2rem; margin-bottom: 10px; }
+
+  .pdf-drop-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .pdf-drop-sub {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .pdf-status {
+    margin-top: 10px;
+    font-size: 0.8rem;
+    font-family: 'DM Mono', monospace;
+    color: var(--pass);
+    min-height: 20px;
+  }
+
+  .pdf-status.error { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>JCC Hiring Screener</h1>
+  <span>Internal Use Only · 2026</span>
+</header>
+
+<div class="container">
+
+  <!-- Step indicator -->
+  <div class="steps">
+    <div class="step active" id="step1-tab">01 · Setup</div>
+    <div class="step" id="step2-tab">02 · Resume</div>
+    <div class="step" id="step3-tab">03 · Q1–Q5</div>
+    <div class="step" id="step4-tab">04 · Analysis</div>
+  </div>
+
+  <!-- Step 1: Setup -->
+  <div class="card visible" id="step1">
+    <div class="card-title">Candidate Setup</div>
+    <div class="card-sub">Basic info before screening</div>
+
+    <label>Candidate Name</label>
+    <input type="text" id="candidateName" placeholder="Full name">
+
+    <label>Position Applied</label>
+    <select id="position">
+      <option value="">— Select position —</option>
+      <option value="framing_carpenter">Framing Carpenter ($28–$36/hr)</option>
+      <option value="framing_apprentice">Framing Apprentice ($25–$28/hr)</option>
+      <option value="plumber">Plumber — Residential & Light Commercial ($30–$40/hr)</option>
+    </select>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goStep2()">Next →</button>
+      <div class="error-msg" id="err1">Please enter a name and select a position.</div>
+    </div>
+  </div>
+
+  <!-- Step 2: Resume -->
+  <div class="card" id="step2">
+    <div class="card-title">Resume</div>
+    <div class="card-sub">Upload a PDF or paste the text directly</div>
+
+    <div class="resume-toggle">
+      <button class="toggle-btn active" id="togglePaste" onclick="switchResumeMode('paste')">Paste Text</button>
+      <button class="toggle-btn" id="togglePDF" onclick="switchResumeMode('pdf')">Upload PDF</button>
+    </div>
+
+    <div id="pasteMode">
+      <label>Resume Text</label>
+      <textarea id="resumeText" rows="14" placeholder="Paste resume content here..."></textarea>
+    </div>
+
+    <div id="pdfMode" style="display:none;">
+      <div class="pdf-drop" id="pdfDrop"
+        onclick="document.getElementById('pdfFile').click()"
+        ondragover="event.preventDefault();this.classList.add('drag-over')"
+        ondragleave="this.classList.remove('drag-over')"
+        ondrop="handlePDFDrop(event)">
+        <div class="pdf-drop-icon">📄</div>
+        <div class="pdf-drop-label" id="pdfDropLabel">Click to select PDF</div>
+        <div class="pdf-drop-sub">or drag and drop here</div>
+        <input type="file" id="pdfFile" accept=".pdf" style="display:none;" onchange="handlePDF(event)">
+      </div>
+      <div class="pdf-status" id="pdfStatus"></div>
+      <textarea id="resumeTextPDF" rows="7" style="display:none;margin-top:12px;font-size:0.78rem;color:var(--muted);background:var(--paper);border:1px dashed var(--rule);border-radius:4px;padding:12px;resize:vertical;width:100%;font-family:'DM Sans',sans-serif;" readonly placeholder="Extracted text will appear here..."></textarea>
+      <div id="pdfPreviewToggle" style="display:none;margin-top:6px;">
+        <button class="btn btn-secondary" style="padding:7px 14px;font-size:0.7rem;" onclick="togglePDFPreview()">▸ Show extracted text</button>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goStep1()">← Back</button>
+      <button class="btn btn-primary" onclick="goStep3()">Next →</button>
+      <div class="error-msg" id="err2">Please provide resume content.</div>
+    </div>
+  </div>
+
+  <!-- Step 3: Written Screening Q1–Q5 -->
+  <div class="card" id="step3">
+    <div class="card-title">Written Screening — Q1 to Q5</div>
+    <div class="card-sub">Paste the candidate's written responses</div>
+
+    <div class="q-block">
+      <div class="q-label">Q1</div>
+      <div class="q-text">Tell me about your last two jobs. What did you do, how long were you there, and why did you leave? <span class="purpose">— Reveals stability, self-awareness, honesty.</span></div>
+      <textarea id="q1" rows="4" placeholder="Candidate's answer..."></textarea>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label">Q2</div>
+      <div class="q-text">Walk me through a job where something went wrong on site. What happened and what did you do? <span class="purpose">— Tests problem-solving, accountability, field judgment.</span></div>
+      <textarea id="q2" rows="4" placeholder="Candidate's answer..."></textarea>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label">Q3</div>
+      <div class="q-text">What does a good day on the job look like for you? <span class="purpose">— Reveals motivation and work values.</span></div>
+      <textarea id="q3" rows="4" placeholder="Candidate's answer..."></textarea>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label">Q4</div>
+      <div class="q-text">Have you ever had to train or help someone newer than you on a job site? How did you handle it? <span class="purpose">— Signals leadership potential and patience.</span></div>
+      <textarea id="q4" rows="4" placeholder="Candidate's answer..."></textarea>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label">Q5</div>
+      <div class="q-text">What are you looking for in your next job that you haven't had in recent ones? <span class="purpose">— Reveals what they want and whether JCC can offer it.</span></div>
+      <textarea id="q5" rows="4" placeholder="Candidate's answer..."></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goStep2()">← Back</button>
+      <button class="btn btn-primary" id="analyzeBtn" onclick="analyze()">Run Analysis →</button>
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <span>Analyzing candidate...</span>
+      </div>
+      <div class="error-msg" id="err3">Please fill in at least Q1–Q3 before analyzing.</div>
+    </div>
+  </div>
+
+  <!-- Step 4: Results -->
+  <div class="card" id="step4">
+    <div class="results" id="resultsArea">
+      <!-- Injected by JS -->
+    </div>
+    <div class="reset-row">
+      <button class="btn btn-secondary" onclick="resetAll()">← Screen Another Candidate</button>
+      <span style="margin-left:12px; font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--muted);">Use Ctrl+P to print this page</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const POSITIONS = {
+    framing_carpenter: {
+      label: "Framing Carpenter",
+      rate: "$28–$36/hr",
+      criteria: [
+        { name: "Years of Experience", weight: 3, note: "3+ yrs required; 5+ preferred" },
+        { name: "Project Type", weight: 2, note: "Residential required. Commercial/TI: strong plus" },
+        { name: "Stability", weight: 2, note: "1+ yr per employer; look for growth pattern" },
+        { name: "Independence & Judgment", weight: 2, note: "Works without supervision; solves problems on site" },
+        { name: "Leadership Potential", weight: 1, note: "Has led crew or trained others" }
+      ]
+    },
+    framing_apprentice: {
+      label: "Framing Apprentice",
+      rate: "$25–$28/hr",
+      criteria: [
+        { name: "Years of Experience", weight: 3, note: "1–3 yrs (2nd level, supervised); 3+ yrs independent work (3rd level)" },
+        { name: "Project Type", weight: 2, note: "Residential framing preferred; any real construction site counts" },
+        { name: "Stability", weight: 2, note: "Consistent history; frequent job changes = reliability risk" },
+        { name: "Attitude & Work Ethic", weight: 2, note: "Shows up on time, takes direction, coachable — key signal at this level" },
+        { name: "Growth Potential", weight: 1, note: "Certifications, extra effort, willingness to mentor or lead" }
+      ]
+    },
+    plumber: {
+      label: "Plumber",
+      rate: "$30–$40/hr",
+      criteria: [
+        { name: "Years of Experience", weight: 3, note: "3+ yrs required; 5+ preferred; residential + new construction ideal" },
+        { name: "Project Type", weight: 2, note: "Residential remodel required. New construction: strong plus" },
+        { name: "Stability", weight: 2, note: "1+ yr per employer; trades move more — look for growth pattern" },
+        { name: "Independence & Judgment", weight: 2, note: "Diagnoses problems, selects materials, works without supervision" },
+        { name: "License / Certifications", weight: 1, note: "CA plumbing license or in-progress" }
+      ]
+    }
+  };
+
+  // ── Resume mode toggle ──────────────────────────────
+  let resumeMode = 'paste'; // 'paste' | 'pdf'
+  let pdfPreviewVisible = false;
+
+  function switchResumeMode(mode) {
+    resumeMode = mode;
+    document.getElementById('togglePaste').classList.toggle('active', mode === 'paste');
+    document.getElementById('togglePDF').classList.toggle('active', mode === 'pdf');
+    document.getElementById('pasteMode').style.display = mode === 'paste' ? 'block' : 'none';
+    document.getElementById('pdfMode').style.display = mode === 'pdf' ? 'block' : 'none';
+    document.getElementById('err2').classList.remove('visible');
+  }
+
+  function getResumeText() {
+    if (resumeMode === 'paste') {
+      return document.getElementById('resumeText').value.trim();
+    } else {
+      return document.getElementById('resumeTextPDF').value.trim();
+    }
+  }
+
+  function handlePDFDrop(e) {
+    e.preventDefault();
+    document.getElementById('pdfDrop').classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type === 'application/pdf') {
+      processPDFFile(file);
+    } else {
+      showPDFStatus('Only PDF files are supported.', true);
+    }
+  }
+
+  function handlePDF(e) {
+    const file = e.target.files[0];
+    if (file) processPDFFile(file);
+  }
+
+  async function processPDFFile(file) {
+    showPDFStatus('Reading PDF...', false);
+    document.getElementById('pdfDropLabel').textContent = file.name;
+
+    try {
+      // Use PDF.js from CDN to extract text
+      if (!window.pdfjsLib) {
+        await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      }
+
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let fullText = '';
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const pageText = content.items.map(item => item.str).join(' ');
+        fullText += pageText + '\n';
+      }
+
+      fullText = fullText.trim();
+      if (!fullText || fullText.length < 30) {
+        showPDFStatus('Could not extract text. Try pasting the resume instead.', true);
+        return;
+      }
+
+      document.getElementById('resumeTextPDF').value = fullText;
+      showPDFStatus(`✓ ${pdf.numPages} page${pdf.numPages > 1 ? 's' : ''} extracted — ${fullText.length} characters`, false);
+      document.getElementById('pdfPreviewToggle').style.display = 'block';
+
+    } catch (err) {
+      showPDFStatus('Extraction failed. Try pasting the resume instead.', true);
+      console.error(err);
+    }
+  }
+
+  function showPDFStatus(msg, isError) {
+    const el = document.getElementById('pdfStatus');
+    el.textContent = msg;
+    el.className = 'pdf-status' + (isError ? ' error' : '');
+  }
+
+  function togglePDFPreview() {
+    pdfPreviewVisible = !pdfPreviewVisible;
+    const ta = document.getElementById('resumeTextPDF');
+    const btn = document.querySelector('#pdfPreviewToggle button');
+    ta.style.display = pdfPreviewVisible ? 'block' : 'none';
+    btn.textContent = pdfPreviewVisible ? '▾ Hide extracted text' : '▸ Show extracted text';
+  }
+
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  // ── Navigation ───────────────────────────────────────
+  function goStep1() {
+    showStep(1);
+  }
+
+  function goStep2() {
+    const name = document.getElementById('candidateName').value.trim();
+    const pos = document.getElementById('position').value;
+    if (!name || !pos) {
+      document.getElementById('err1').classList.add('visible');
+      return;
+    }
+    document.getElementById('err1').classList.remove('visible');
+    showStep(2);
+  }
+
+  function goStep3() {
+    const resume = getResumeText();
+    if (resume.length < 50) {
+      document.getElementById('err2').classList.add('visible');
+      return;
+    }
+    document.getElementById('err2').classList.remove('visible');
+    showStep(3);
+  }
+
+  function showStep(n) {
+    [1,2,3,4].forEach(i => {
+      document.getElementById(`step${i}`).classList.remove('visible');
+      const tab = document.getElementById(`step${i}-tab`);
+      tab.classList.remove('active','done');
+      if (i < n) tab.classList.add('done');
+      if (i === n) tab.classList.add('active');
+    });
+    document.getElementById(`step${n}`).classList.add('visible');
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  async function analyze() {
+    const q1 = document.getElementById('q1').value.trim();
+    const q2 = document.getElementById('q2').value.trim();
+    const q3 = document.getElementById('q3').value.trim();
+    if (!q1 || !q2 || !q3) {
+      document.getElementById('err3').classList.add('visible');
+      return;
+    }
+    document.getElementById('err3').classList.remove('visible');
+
+    const name = document.getElementById('candidateName').value.trim();
+    const posKey = document.getElementById('position').value;
+    const pos = POSITIONS[posKey];
+    const resume = getResumeText();
+    const q4 = document.getElementById('q4').value.trim();
+    const q5 = document.getElementById('q5').value.trim();
+
+    document.getElementById('analyzeBtn').disabled = true;
+    document.getElementById('loading').classList.add('visible');
+
+    const criteriaList = pos.criteria.map(c => `- ${c.name} (weight ×${c.weight}): ${c.note}`).join('\n');
+
+    const prompt = `You are a hiring screener for John Christopher Construction (JCC), a General Contractor in Orange County, CA. 
+
+You are evaluating a candidate for the ${pos.label} position (${pos.rate}).
+
+CANDIDATE NAME: ${name}
+
+RESUME:
+${resume}
+
+WRITTEN SCREENING ANSWERS:
+Q1 (Stability/Self-awareness): ${q1}
+Q2 (Problem-solving/Accountability): ${q2}
+Q3 (Work values/Motivation): ${q3}
+Q4 (Leadership potential): ${q4 || "(not provided)"}
+Q5 (What they want): ${q5 || "(not provided)"}
+
+EVALUATION CRITERIA (score each 1–5, multiply by weight):
+${criteriaList}
+Maximum possible score: 50
+
+JCC values: people who take ownership, solve problems without being told, communicate proactively, and have the character to grow into leadership over time. A candidate with slightly less experience but a clear growth mindset is preferred over one who checks every technical box but shows no ambition or accountability.
+
+Respond ONLY with a valid JSON object in this exact structure:
+{
+  "scorecard": [
+    {"criterion": "...", "weight": N, "score": N, "weighted": N, "reasoning": "one concise sentence"}
+  ],
+  "total": N,
+  "verdict": "ADVANCE" | "REVIEW" | "DO NOT ADVANCE",
+  "verdictReason": "2–3 sentences explaining the overall recommendation",
+  "redFlags": ["flag 1", "flag 2"],
+  "qAnalysis": [
+    {"q": "Q1", "topic": "Stability & Self-awareness", "signal": "STRONG" | "MIXED" | "WEAK", "analysis": "2–3 sentences"},
+    {"q": "Q2", "topic": "Problem-solving & Accountability", "signal": "STRONG" | "MIXED" | "WEAK", "analysis": "2–3 sentences"},
+    {"q": "Q3", "topic": "Work Values & Motivation", "signal": "STRONG" | "MIXED" | "WEAK", "analysis": "2–3 sentences"},
+    {"q": "Q4", "topic": "Leadership Potential", "signal": "STRONG" | "MIXED" | "WEAK", "analysis": "2–3 sentences"},
+    {"q": "Q5", "topic": "Fit with JCC", "signal": "STRONG" | "MIXED" | "WEAK", "analysis": "2–3 sentences"}
+  ],
+  "zoomFocus": "Which 2–3 Zoom questions (Q6–Q12) to prioritize for this specific candidate and why — 2 sentences."
+}
+
+Return ONLY the JSON. No markdown, no preamble.`;
+
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "anthropic-dangerous-direct-browser-access": "true"
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-5",
+          max_tokens: 2000,
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(`API error ${response.status}: ${errData?.error?.message || response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (!data.content || !data.content.length) throw new Error("Empty response from API");
+      const raw = data.content.map(b => b.text || "").join("").trim();
+      const clean = raw.replace(/```json|```/g, "").trim();
+      const result = JSON.parse(clean);
+
+      renderResults(result, name, pos);
+      showStep(4);
+
+    } catch(e) {
+      alert("Analysis failed:\n\n" + e.message);
+    } finally {
+      document.getElementById('analyzeBtn').disabled = false;
+      document.getElementById('loading').classList.remove('visible');
+    }
+  }
+
+  function renderResults(r, name, pos) {
+    const verdictClass = r.verdict === "ADVANCE" ? "pass" : r.verdict === "REVIEW" ? "review" : "fail";
+    const verdictLabel = r.verdict === "ADVANCE" ? "✓ Invite to Written Screening" : r.verdict === "REVIEW" ? "⚠ Review Carefully" : "✕ Do Not Advance";
+
+    let criteriaRows = r.scorecard.map(c => {
+      const score = c.score;
+      const dotClass = score >= 4 ? "good" : score >= 3 ? "mid" : "low";
+      const dots = [1,2,3,4,5].map(i => `<div class="dot ${i <= score ? 'filled ' + dotClass : ''}"></div>`).join('');
+      return `
+        <div class="criteria-row">
+          <div class="criteria-name">${c.criterion}</div>
+          <div class="criteria-weight">×${c.weight}</div>
+          <div class="criteria-score-display">${dots}</div>
+          <div class="criteria-pts">${c.weighted}/${c.weight*5} pts</div>
+        </div>
+        <div style="font-size:0.76rem;color:var(--muted);padding:4px 16px 10px;line-height:1.5;">${c.reasoning}</div>
+      `;
+    }).join('');
+
+    let qRows = r.qAnalysis.map(q => {
+      const sigClass = q.signal === "STRONG" ? "strong" : q.signal === "MIXED" ? "mixed" : "weak";
+      const sigLabel = q.signal === "STRONG" ? "Strong signal" : q.signal === "MIXED" ? "Mixed signal" : "Weak signal";
+      return `
+        <div class="q-analysis">
+          <div class="q-analysis-header">
+            <span class="q-tag">${q.q}</span>
+            <span class="q-analysis-title">${q.topic}</span>
+            <span class="q-signal ${sigClass}">${sigLabel}</span>
+          </div>
+          <div class="q-analysis-body">${q.analysis}</div>
+        </div>
+      `;
+    }).join('');
+
+    let flagRows = (r.redFlags && r.redFlags.length > 0)
+      ? r.redFlags.map(f => `<div class="flag-item"><span class="flag-icon">⚑</span><span>${f}</span></div>`).join('')
+      : `<div style="font-size:0.83rem;color:var(--muted);padding:8px 0;">No significant red flags identified.</div>`;
+
+    const now = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+
+    document.getElementById('resultsArea').innerHTML = `
+      <div class="score-banner ${verdictClass}">
+        <div>
+          <div class="score-number">${r.total}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);margin-top:4px;">out of 50</div>
+        </div>
+        <div class="score-meta">
+          <div class="score-verdict">${verdictLabel}</div>
+          <div class="score-name">${name}</div>
+          <div class="score-position">${pos.label} · ${pos.rate} · Reviewed ${now}</div>
+        </div>
+      </div>
+
+      <div class="section-title">Scorecard Breakdown</div>
+      <div class="criteria-grid">${criteriaRows}</div>
+
+      <div class="section-title">Written Screening Analysis — Q1 to Q5</div>
+      <div style="margin-bottom:24px;">${qRows}</div>
+
+      ${r.redFlags && r.redFlags.length > 0 ? `
+        <div class="section-title">Red Flags</div>
+        <div class="flags-section">${flagRows}</div>
+      ` : ''}
+
+      <div class="recommendation-box">
+        <div class="rec-label">Recommendation</div>
+        <div class="rec-text">${r.verdictReason}</div>
+        ${r.zoomFocus ? `<div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.15);font-size:0.82rem;color:var(--accent-light);"><strong style="font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:4px;">If advancing to Zoom — focus on:</strong>${r.zoomFocus}</div>` : ''}
+      </div>
+    `;
+
+    document.getElementById('resultsArea').classList.add('visible');
+  }
+
+  function resetAll() {
+    document.getElementById('candidateName').value = '';
+    document.getElementById('position').value = '';
+    document.getElementById('resumeText').value = '';
+    document.getElementById('resumeTextPDF').value = '';
+    document.getElementById('resumeTextPDF').style.display = 'none';
+    document.getElementById('pdfStatus').textContent = '';
+    document.getElementById('pdfStatus').className = 'pdf-status';
+    document.getElementById('pdfDropLabel').textContent = 'Click to select PDF';
+    document.getElementById('pdfPreviewToggle').style.display = 'none';
+    document.getElementById('pdfFile').value = '';
+    pdfPreviewVisible = false;
+    switchResumeMode('paste');
+    ['q1','q2','q3','q4','q5'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('resultsArea').innerHTML = '';
+    document.getElementById('resultsArea').classList.remove('visible');
+    showStep(1);
+  }
+</script>
+</body>
+</html>
