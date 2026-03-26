@@ -613,6 +613,10 @@
     <div class="card-title">Candidate Setup</div>
     <div class="card-sub">Basic info before screening</div>
 
+    <label>Anthropic API Key</label>
+    <input type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off">
+    <div style="font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);margin-top:5px;">Your key is never stored — only used for this session. Get yours at console.anthropic.com</div>
+
     <label>Candidate Name</label>
     <input type="text" id="candidateName" placeholder="Full name">
 
@@ -626,7 +630,7 @@
 
     <div class="btn-row">
       <button class="btn btn-primary" onclick="goStep2()">Next →</button>
-      <div class="error-msg" id="err1">Please enter a name and select a position.</div>
+      <div class="error-msg" id="err1">Please fill in all fields.</div>
     </div>
   </div>
 
@@ -871,9 +875,10 @@
   }
 
   function goStep2() {
+    const apiKey = document.getElementById('apiKey').value.trim();
     const name = document.getElementById('candidateName').value.trim();
     const pos = document.getElementById('position').value;
-    if (!name || !pos) {
+    if (!apiKey || !name || !pos) {
       document.getElementById('err1').classList.add('visible');
       return;
     }
@@ -919,6 +924,7 @@
     const resume = getResumeText();
     const q4 = document.getElementById('q4').value.trim();
     const q5 = document.getElementById('q5').value.trim();
+    const apiKey = document.getElementById('apiKey').value.trim();
 
     document.getElementById('analyzeBtn').disabled = true;
     document.getElementById('loading').classList.add('visible');
@@ -973,6 +979,8 @@ Return ONLY the JSON. No markdown, no preamble.`;
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
           "anthropic-dangerous-direct-browser-access": "true"
         },
         body: JSON.stringify({
@@ -1079,6 +1087,7 @@ Return ONLY the JSON. No markdown, no preamble.`;
   }
 
   function resetAll() {
+    document.getElementById('apiKey').value = '';
     document.getElementById('candidateName').value = '';
     document.getElementById('position').value = '';
     document.getElementById('resumeText').value = '';
